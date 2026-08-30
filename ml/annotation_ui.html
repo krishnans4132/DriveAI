@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DriveAlert Ground-Truth Labeling</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: #090d14;
+      color: #eef3fb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top, #17263c, #090d14 55%); }
+    button { font: inherit; }
+    .app { min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
+    header { display: flex; gap: 18px; align-items: center; padding: 16px 24px; border-bottom: 1px solid #2a3547; background: rgba(8, 13, 21, .88); }
+    h1 { margin: 0; font-size: 18px; letter-spacing: .02em; }
+    .task-tabs { display: flex; gap: 8px; margin-left: auto; }
+    .tab, .undo { border: 1px solid #42516a; color: #d8e4f5; background: #172133; border-radius: 9px; padding: 9px 14px; cursor: pointer; }
+    .tab.active { background: #2f70ff; border-color: #5890ff; color: white; }
+    .progress { min-width: 205px; text-align: right; color: #aebbd0; font-variant-numeric: tabular-nums; }
+    main { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; padding: 22px; min-height: 0; }
+    .viewer { display: grid; place-items: center; min-height: 420px; border: 1px solid #2a3547; border-radius: 16px; background: rgba(2, 6, 12, .72); overflow: hidden; }
+    .single-image { max-width: 94%; max-height: 68vh; width: auto; height: auto; image-rendering: auto; }
+    .context-strip { width: 100%; display: flex; gap: 10px; align-items: center; justify-content: center; padding: 20px; overflow-x: auto; }
+    .context-card { flex: 0 0 17%; opacity: .48; border: 2px solid transparent; border-radius: 12px; overflow: hidden; background: #111926; }
+    .context-card.current { flex-basis: 28%; opacity: 1; border-color: #4d86ff; box-shadow: 0 0 0 4px rgba(77, 134, 255, .15); }
+    .context-card img { display: block; width: 100%; height: auto; }
+    aside { border: 1px solid #2a3547; border-radius: 16px; background: rgba(14, 21, 33, .92); padding: 20px; }
+    aside h2 { margin-top: 0; font-size: 16px; }
+    aside p, aside li { color: #b5c1d4; line-height: 1.45; font-size: 14px; }
+    aside ul { padding-left: 19px; }
+    .blinded { margin-top: 18px; padding: 12px; border-radius: 10px; background: #111a28; color: #8fa1ba; font-size: 12px; }
+    footer { padding: 14px 22px 22px; }
+    .labels { display: grid; grid-template-columns: repeat(5, minmax(130px, 1fr)); gap: 10px; }
+    .label-button { min-height: 58px; border: 1px solid #42516a; border-radius: 11px; background: #172133; color: #f2f6fc; cursor: pointer; padding: 8px; }
+    .label-button:hover { border-color: #79a3ff; background: #202f49; }
+    .key { display: inline-grid; place-items: center; min-width: 25px; height: 25px; margin-right: 7px; border-radius: 6px; background: #33435c; color: white; font-weight: 700; }
+    .message { min-height: 24px; margin-top: 10px; color: #8fb5ff; text-align: center; }
+    .done { color: #6de6a0; font-size: 20px; text-align: center; }
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      aside { display: none; }
+      .labels { grid-template-columns: repeat(2, 1fr); }
+      header { flex-wrap: wrap; }
+      .progress { width: 100%; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>DriveAlert · Ground Truth</h1>
+    <button class="undo" id="undo">Undo <span class="key">Z</span></button>
+    <div class="task-tabs">
+      <button class="tab active" data-task="eye">Eye state</button>
+      <button class="tab" data-task="mouth">Mouth event</button>
+    </div>
+    <div class="progress" id="progress">Loading…</div>
+  </header>
+
+  <main>
+    <section class="viewer" id="viewer"></section>
+    <aside>
+      <div id="instructions"></div>
+      <div class="blinded">
+        Dataset, driver state, EAR, MAR, and participant identity are hidden until annotation is complete. Judge only what is visibly supported.
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="labels" id="labels"></div>
+    <div class="message" id="message"></div>
+  </footer>
+</div>
+
+<script>
+  const taskConfig = {
+    eye: {
+      instructions: `
+        <h2>Eye-state definition</h2>
+        <ul>
+          <li><b>Open:</b> both eyes visibly open.</li>
+          <li><b>Closed:</b> both eyes at least ~80% closed.</li>
+          <li><b>Transitional:</b> partial blink, asymmetric closure, or one eye closed.</li>
+          <li><b>Uncertain:</b> visible but the state cannot be judged confidently.</li>
+          <li><b>Unusable:</b> sunglasses, severe occlusion, bad crop, or no visible eyes.</li>
+        </ul>`,
+      labels: [
+        ["1", "open", "Open"],
+        ["2", "closed", "Closed"],
+        ["3", "transitional", "Transitional"],
+        ["4", "uncertain", "Uncertain"],
+        ["5", "unusable", "Unusable"]
+      ]
+    },
+    mouth: {
+      instructions: `
+        <h2>Mouth-event definition</h2>
+        <p>Judge the highlighted center frame using its neighboring frames.</p>
+        <ul>
+          <li><b>Not yawn:</b> neutral/closed mouth without a yawn sequence.</li>
+          <li><b>Yawn:</b> sustained wide opening with yawn-like progression.</li>
+          <li><b>Talking:</b> speech-like changing mouth shapes.</li>
+          <li><b>Uncertain:</b> yawn versus speech cannot be resolved.</li>
+          <li><b>Unusable:</b> occluded, badly cropped, or not visible.</li>
+        </ul>`,
+      labels: [
+        ["1", "not_yawn", "Not yawn"],
+        ["2", "yawn", "Yawn"],
+        ["3", "talking", "Talking"],
+        ["4", "uncertain", "Uncertain"],
+        ["5", "unusable", "Unusable"]
+      ]
+    }
+  };
+
+  let task = "eye";
+  let current = null;
+  let saving = false;
+
+  const viewer = document.getElementById("viewer");
+  const labels = document.getElementById("labels");
+  const instructions = document.getElementById("instructions");
+  const progress = document.getElementById("progress");
+  const message = document.getElementById("message");
+
+  function renderControls() {
+    const config = taskConfig[task];
+    instructions.innerHTML = config.instructions;
+    labels.innerHTML = config.labels.map(([key, value, title]) => `
+      <button class="label-button" data-label="${value}">
+        <span class="key">${key}</span>${title}
+      </button>`).join("");
+    labels.querySelectorAll("button").forEach(button => {
+      button.addEventListener("click", () => saveLabel(button.dataset.label));
+    });
+  }
+
+  function renderStatus(status) {
+    const value = status[task];
+    const pct = value.total ? (value.completed / value.total * 100).toFixed(1) : "0.0";
+    progress.textContent = `${task === "eye" ? "Eyes" : "Mouth"}: ${value.completed} / ${value.total} · ${pct}%`;
+  }
+
+  function renderItem(item) {
+    current = item;
+    if (!item) {
+      viewer.innerHTML = `<div class="done">${task === "eye" ? "Eye" : "Mouth"} annotations complete ✓</div>`;
+      return;
+    }
+    if (item.task === "eye") {
+      viewer.innerHTML = `<img class="single-image" src="${item.image_urls[0]}" alt="Eye crop">`;
+    } else {
+      viewer.innerHTML = `<div class="context-strip">${item.image_urls.map((url, index) => `
+        <div class="context-card ${index === item.current_index ? "current" : ""}">
+          <img src="${url}" alt="Mouth context frame ${index + 1}">
+        </div>`).join("")}</div>`;
+    }
+  }
+
+  async function loadNext() {
+    message.textContent = "";
+    const response = await fetch(`/api/next?task=${task}`);
+    const payload = await response.json();
+    renderStatus(payload.status);
+    renderItem(payload.item);
+  }
+
+  async function saveLabel(label) {
+    if (!current || saving) return;
+    saving = true;
+    const annotationId = current.annotation_id;
+    try {
+      const response = await fetch("/api/label", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({annotation_id: annotationId, label})
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Save failed");
+      renderStatus(payload.status);
+      await loadNext();
+    } catch (error) {
+      message.textContent = error.message;
+    } finally {
+      saving = false;
+    }
+  }
+
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", async () => {
+      task = tab.dataset.task;
+      document.querySelectorAll(".tab").forEach(item => item.classList.toggle("active", item === tab));
+      renderControls();
+      await loadNext();
+    });
+  });
+
+  document.getElementById("undo").addEventListener("click", async () => {
+    const response = await fetch("/api/undo", {method: "POST"});
+    const payload = await response.json();
+    message.textContent = payload.undone ? `Undid ${payload.annotation_id}` : "Nothing to undo in this session";
+    renderStatus(payload.status);
+    await loadNext();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.repeat || saving) return;
+    if (event.key.toLowerCase() === "z") {
+      document.getElementById("undo").click();
+      return;
+    }
+    const entry = taskConfig[task].labels.find(([key]) => key === event.key);
+    if (entry) saveLabel(entry[1]);
+  });
+
+  renderControls();
+  loadNext();
+</script>
+</body>
+</html>
