@@ -1,0 +1,17 @@
+{
+  "model": "drivealert_mouth_v1",
+  "architecture": "mobilenet_v3_small",
+  "selected_yawn_threshold": 0.355,
+  "selected_using": "validation_split_only",
+  "selection_rule": "Highest non-yawn specificity while maintaining at least 90% yawn recall",
+  "decision_policy": "Predict yawn when yawn probability >= 0.355. Otherwise choose the higher probability between not_yawn and talking.",
+  "validation_metrics": {
+    "yawn_precision": 0.8698,
+    "yawn_recall": 0.9013,
+    "non_yawn_specificity": 0.9841,
+    "yawn_f1": 0.8853,
+    "balanced_accuracy": 0.9427
+  },
+  "labels_are_ground_truth": false,
+  "warning": "Threshold was selected using provisional weak labels. Independent human validation is required before production use."
+}

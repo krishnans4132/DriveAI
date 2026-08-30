@@ -1,0 +1,110 @@
+{
+  "model_name": "drivealert_mouth_v1",
+  "task": "three_class_mouth_event_classification",
+  "architecture": "mobilenet_v3_small",
+  "classes": {
+    "not_yawn": 0,
+    "talking": 1,
+    "yawn": 2
+  },
+  "output": {
+    "name": "class_logits",
+    "activation": "softmax"
+  },
+  "decision_policy": {
+    "yawn_threshold": 0.355,
+    "rule": "Predict yawn when yawn probability is at least 0.355. Otherwise select the larger probability between not_yawn and talking."
+  },
+  "input": {
+    "layout": "NCHW",
+    "dtype": "float32",
+    "height": 96,
+    "width": 160,
+    "color": "RGB",
+    "normalization": {
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ]
+    }
+  },
+  "checkpoint_epoch": 12,
+  "validation_macro_ap": 0.9642046627053547,
+  "threshold_selection": {
+    "split": "validation",
+    "yawn_threshold": 0.355,
+    "rule": "Highest non-yawn specificity while maintaining at least 90% yawn recall"
+  },
+  "test_metrics": {
+    "model": "drivealert_mouth_v1",
+    "threshold_locked_before_test": true,
+    "selected_yawn_threshold": 0.355,
+    "labels_are_ground_truth": false,
+    "macro_average_precision": 0.9832529322806187,
+    "macro_roc_auc": 0.991227688364083,
+    "macro_f1": 0.9502226418825942,
+    "multiclass_balanced_accuracy": 0.9441383401048329,
+    "per_class": {
+      "not_yawn": {
+        "average_precision": 0.9948435976658492,
+        "precision": 0.9766009852216748,
+        "recall": 0.9712186160440907,
+        "f1": 0.9739023641387781,
+        "support": 1633
+      },
+      "talking": {
+        "average_precision": 0.9773167523771671,
+        "precision": 0.9250780437044746,
+        "recall": 0.9508021390374332,
+        "f1": 0.9377637130801688,
+        "support": 935
+      },
+      "yawn": {
+        "average_precision": 0.9775984467988398,
+        "precision": 0.9694656488549618,
+        "recall": 0.910394265232975,
+        "f1": 0.9390018484288355,
+        "support": 279
+      }
+    },
+    "confusion_matrix": [
+      [
+        1586,
+        47,
+        0
+      ],
+      [
+        38,
+        889,
+        8
+      ],
+      [
+        0,
+        25,
+        254
+      ]
+    ],
+    "yawn_vs_rest": {
+      "precision": 0.9694656488549618,
+      "recall": 0.910394265232975,
+      "specificity": 0.9968847352024922,
+      "f1": 0.9390018484288355,
+      "balanced_accuracy": 0.9536395002177336,
+      "tp": 254,
+      "fp": 8,
+      "tn": 2560,
+      "fn": 25
+    }
+  },
+  "training_dataset": "krishnans2005/drivealert-processed-3",
+  "participant_disjoint_splits": true,
+  "labels_are_ground_truth": false,
+  "production_status": "provisional_only",
+  "warning": "Training and evaluation labels are provisional weak labels. Independent human and real-driving validation are required."
+}

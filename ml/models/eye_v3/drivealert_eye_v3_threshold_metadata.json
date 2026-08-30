@@ -1,0 +1,17 @@
+{
+  "model": "drivealert_eye_v3",
+  "architecture": "mobilenet_v3_small",
+  "selected_threshold": 0.06,
+  "positive_class": "closed",
+  "selected_using": "validation_split_only",
+  "selection_rule": "Highest open-eye specificity while maintaining at least 90% closed-eye recall",
+  "validation_metrics": {
+    "closed_recall": 0.9068,
+    "open_specificity": 0.9736,
+    "closed_precision": 0.7441,
+    "closed_f1": 0.8174,
+    "balanced_accuracy": 0.9402
+  },
+  "labels_are_ground_truth": false,
+  "warning": "Threshold was selected using provisional weak labels. Independent human validation is required before production use."
+}
