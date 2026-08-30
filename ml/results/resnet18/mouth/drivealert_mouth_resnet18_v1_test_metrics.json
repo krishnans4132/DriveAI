@@ -1,0 +1,61 @@
+{
+  "model": "drivealert_mouth_resnet18_v1",
+  "threshold_locked_before_test": true,
+  "selected_yawn_threshold": 0.6499999999999999,
+  "labels_are_ground_truth": false,
+  "macro_average_precision": 0.9870491676803089,
+  "macro_roc_auc": 0.9939649589623959,
+  "macro_f1": 0.9606377293837863,
+  "multiclass_balanced_accuracy": 0.9556583578240788,
+  "per_class": {
+    "not_yawn": {
+      "average_precision": 0.9938617597684127,
+      "precision": 0.9795918367346939,
+      "recall": 0.969993876301286,
+      "f1": 0.9747692307692307,
+      "support": 1633
+    },
+    "talking": {
+      "average_precision": 0.9801983907280795,
+      "precision": 0.9306418219461697,
+      "recall": 0.9614973262032086,
+      "f1": 0.9458179905312993,
+      "support": 935
+    },
+    "yawn": {
+      "average_precision": 0.9870873525444345,
+      "precision": 0.9886363636363636,
+      "recall": 0.9354838709677419,
+      "f1": 0.9613259668508287,
+      "support": 279
+    }
+  },
+  "confusion_matrix": [
+    [
+      1584,
+      49,
+      0
+    ],
+    [
+      33,
+      899,
+      3
+    ],
+    [
+      0,
+      18,
+      261
+    ]
+  ],
+  "yawn_vs_rest": {
+    "precision": 0.9886363636363636,
+    "recall": 0.9354838709677419,
+    "specificity": 0.9988317757009346,
+    "f1": 0.9613259668508287,
+    "balanced_accuracy": 0.9671578233343383,
+    "tp": 261,
+    "fp": 3,
+    "tn": 2565,
+    "fn": 18
+  }
+}

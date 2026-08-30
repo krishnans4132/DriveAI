@@ -1,0 +1,17 @@
+{
+  "model": "drivealert_eye_resnet18_v1",
+  "architecture": "resnet18",
+  "selected_threshold": 0.024999999999999998,
+  "positive_class": "closed",
+  "selected_using": "validation_split_only",
+  "selection_rule": "Highest open-eye specificity while maintaining at least 90% closed-eye recall",
+  "validation_metrics": {
+    "closed_recall": 0.9032258064516129,
+    "open_specificity": 0.9766170665047069,
+    "closed_precision": 0.7659574468085106,
+    "closed_f1": 0.8289473684210527,
+    "balanced_accuracy": 0.9399214364781598
+  },
+  "labels_are_ground_truth": false,
+  "warning": "Threshold was selected using provisional weak labels. Independent human validation is required before production use."
+}
