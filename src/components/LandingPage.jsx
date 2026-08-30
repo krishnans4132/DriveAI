@@ -1,15 +1,20 @@
 import React from 'react';
-import { ShieldAlert, BrainCircuit, Activity, Globe } from 'lucide-react';
+import { ShieldAlert, BrainCircuit, Activity, Globe, BarChart3 } from 'lucide-react';
 
-const LandingPage = ({ onLaunch }) => {
+const LandingPage = ({ onLaunch, onCompare }) => {
   return (
     <div style={{ paddingBottom: '60px' }}>
       <header className="landing-hero">
         <h1>DriveAlert AI</h1>
         <p>Real-Time Driver Fatigue and Microsleep Detection for Commercial Transport Safety</p>
-        <button className="btn-primary" onClick={onLaunch} style={{ marginTop: '20px' }}>
-          <span>🚗</span> Launch Live Simulator Demo
-        </button>
+        <div className="hero-actions">
+          <button className="btn-primary" onClick={onLaunch}>
+            <span>🚗</span> Launch Live Simulator
+          </button>
+          <button className="btn-outline hero-compare-button" onClick={onCompare}>
+            <BarChart3 size={19} /> Explore Model Comparison
+          </button>
+        </div>
       </header>
 
       <section style={{ maxWidth: '800px', margin: '0 auto 60px', padding: '0 20px' }}>
