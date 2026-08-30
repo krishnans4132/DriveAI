@@ -1,0 +1,17 @@
+{
+  "model": "drivealert_mouth_efficientnet_b0_v1",
+  "architecture": "efficientnet_b0",
+  "selected_yawn_threshold": 0.6049999999999999,
+  "selected_using": "validation_split_only",
+  "selection_rule": "Highest non-yawn specificity while maintaining at least 90% yawn recall",
+  "decision_policy": "Predict yawn when yawn probability >= 0.605. Otherwise choose the higher probability between not_yawn and talking.",
+  "validation_metrics": {
+    "yawn_precision": 0.9415807560137457,
+    "yawn_recall": 0.9013157894736842,
+    "non_yawn_specificity": 0.9934108527131783,
+    "yawn_f1": 0.9210084033613445,
+    "balanced_accuracy": 0.9473633210934312
+  },
+  "labels_are_ground_truth": false,
+  "warning": "Threshold was selected using provisional weak labels. Independent human validation is required before production use."
+}

@@ -1,0 +1,17 @@
+{
+  "model": "drivealert_eye_efficientnet_b0_v1",
+  "architecture": "efficientnet_b0",
+  "selected_threshold": 0.039999999999999994,
+  "positive_class": "closed",
+  "selected_using": "validation_split_only",
+  "selection_rule": "Highest open-eye specificity while maintaining at least 90% closed-eye recall",
+  "validation_metrics": {
+    "closed_recall": 0.9032258064516129,
+    "open_specificity": 0.9544488308533252,
+    "closed_precision": 0.6268656716417911,
+    "closed_f1": 0.7400881057268722,
+    "balanced_accuracy": 0.928837318652469
+  },
+  "labels_are_ground_truth": false,
+  "warning": "Threshold was selected using provisional weak labels. Independent human validation is required before production use."
+}

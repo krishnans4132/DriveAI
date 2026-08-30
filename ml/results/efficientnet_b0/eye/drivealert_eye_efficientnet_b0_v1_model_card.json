@@ -1,0 +1,94 @@
+{
+  "model_name": "drivealert_eye_efficientnet_b0_v1",
+  "task": "binary_eye_state_classification",
+  "architecture": "efficientnet_b0",
+  "positive_class": "closed",
+  "output": {
+    "name": "closed_logit",
+    "activation": "sigmoid",
+    "threshold": 0.039999999999999994
+  },
+  "input": {
+    "layout": "NCHW",
+    "dtype": "float32",
+    "height": 96,
+    "width": 192,
+    "color": "RGB",
+    "normalization": {
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ]
+    }
+  },
+  "checkpoint_epoch": 6,
+  "validation_ap": 0.9007678555505568,
+  "threshold_selection": {
+    "split": "validation",
+    "threshold": 0.039999999999999994,
+    "rule": "Highest specificity while preserving at least 90% closed-eye recall"
+  },
+  "test_metrics": {
+    "model": "drivealert_eye_efficientnet_b0_v1",
+    "threshold_locked_before_test": true,
+    "labels_are_ground_truth": false,
+    "complete_test": {
+      "samples": 3918,
+      "average_precision": 0.9662096842826836,
+      "roc_auc": 0.9957502103285736,
+      "threshold": 0.039999999999999994,
+      "balanced_accuracy": 0.965274176261107,
+      "closed_precision": 0.4790575916230366,
+      "closed_recall": 0.9838709677419355,
+      "open_specificity": 0.9466773847802786,
+      "closed_f1": 0.6443661971830985,
+      "tp": 183,
+      "fp": 199,
+      "tn": 3533,
+      "fn": 3
+    },
+    "by_dataset": {
+      "uta_rldd": {
+        "samples": 2138,
+        "average_precision": 0.9707808833963121,
+        "roc_auc": 0.9953151123615369,
+        "threshold": 0.039999999999999994,
+        "balanced_accuracy": 0.9634780807871621,
+        "closed_precision": 0.47029702970297027,
+        "closed_recall": 0.979381443298969,
+        "open_specificity": 0.9475747182753552,
+        "closed_f1": 0.6354515050167223,
+        "tp": 95,
+        "fp": 107,
+        "tn": 1934,
+        "fn": 2
+      },
+      "yawdd": {
+        "samples": 1780,
+        "average_precision": 0.9628547310938961,
+        "roc_auc": 0.9961461537950418,
+        "threshold": 0.039999999999999994,
+        "balanced_accuracy": 0.9671791839148433,
+        "closed_precision": 0.4888888888888889,
+        "closed_recall": 0.9887640449438202,
+        "open_specificity": 0.9455943228858663,
+        "closed_f1": 0.654275092936803,
+        "tp": 88,
+        "fp": 92,
+        "tn": 1599,
+        "fn": 1
+      }
+    }
+  },
+  "training_dataset": "krishnans2005/drivealert-processed-3",
+  "participant_disjoint_splits": true,
+  "labels_are_ground_truth": false,
+  "production_status": "provisional_only",
+  "warning": "Training and evaluation labels are provisional weak labels. Independent human and real-driving validation are required."
+}
