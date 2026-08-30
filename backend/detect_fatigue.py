@@ -1,32 +1,40 @@
-def calculate_ear(eye_landmarks):
-    # Mock function to calculate Eye Aspect Ratio
-    pass
+"""Compatibility facade around the real temporal fatigue engine.
 
-def calculate_perclos(frames):
-    # Mock function to calculate PERCLOS over a window of frames
-    pass
+Image inference will be connected in the next integration step. This module now
+accepts model probabilities instead of the old hard-coded EAR placeholder.
+"""
+
+try:
+    from .fatigue_engine import FatigueConfig, FatigueEngine, FrameEvidence
+except ImportError:  # Supports running this module directly from backend/.
+    from fatigue_engine import FatigueConfig, FatigueEngine, FrameEvidence
+
 
 class FatigueDetector:
-    def __init__(self, speed_adaptive=True):
-        self.speed_adaptive = speed_adaptive
-        self.base_threshold = 0.25 # EAR threshold
+    def __init__(self, config: FatigueConfig | None = None) -> None:
+        self.engine = FatigueEngine(config)
 
-    def analyze_frame(self, frame, current_speed, continuous_drive_time):
-        # 1. Speed-Adaptive Risk Thresholding (Velocity-Context Filter)
-        dynamic_threshold = self.base_threshold
-        if self.speed_adaptive:
-            if current_speed > 80: # High speed -> higher threshold (more sensitive)
-                dynamic_threshold += 0.05
-            elif current_speed < 30: # Low speed -> lower threshold
-                dynamic_threshold -= 0.05
-                
-        # 2. Dynamic Continuous-Drive Sensitivity Shift
-        # Increase sensitivity as continuous drive time increases (e.g., > 4 hours)
-        if continuous_drive_time > 4:
-            dynamic_threshold += (continuous_drive_time - 4) * 0.02
-            
-        # Example output
-        return {
-            "fatigue_detected": False, # Mock
-            "current_threshold": dynamic_threshold
-        }
+    def reset(self) -> None:
+        self.engine.reset()
+
+    def analyze_observation(
+        self,
+        *,
+        timestamp_s: float,
+        eye_closed_probability: float | None,
+        yawn_probability: float | None,
+        face_detected: bool,
+        current_speed_kph: float,
+        continuous_drive_minutes: float,
+    ) -> dict[str, object]:
+        decision = self.engine.update(
+            FrameEvidence(
+                timestamp_s=timestamp_s,
+                eye_closed_probability=eye_closed_probability,
+                yawn_probability=yawn_probability,
+                face_detected=face_detected,
+                speed_kph=current_speed_kph,
+                continuous_drive_minutes=continuous_drive_minutes,
+            )
+        )
+        return decision.to_dict()
