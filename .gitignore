@@ -30,3 +30,12 @@ __pycache__/
 .venv
 venv/
 ENV/
+ml-env/
+
+# Local ML datasets and generated preprocessing outputs
+ml/raw_data/
+ml/processed_data*/
+
+# Local export bundles and packaged datasets/models
+# Keep reproducible notebooks, scripts, compact reports, and deployed models in Git.
+ml/artifacts/
