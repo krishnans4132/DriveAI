@@ -13,8 +13,8 @@ DriveAlert AI is a proactive cognitive co-pilot designed to monitor commercial d
 ```
 +----------------+        +-------------------+        +--------------------+
 |                |        |                   |        |                    |
-|  Driver Webcam |------->|  Face/Eye Tracker |------->| Fatigue Detection  |
-|  (Video Feed)  |        |  (EAR & PERCLOS)  |        | Model (MobileNet)  |
+|  Driver Webcam |------->| Eye + Mouth Crops |------->| MobileNetV3-Small  |
+|  (Video Feed)  |        | (MediaPipe/OpenCV)|        | Trained Models     |
 |                |        |                   |        |                    |
 +----------------+        +-------------------+        +---------+----------+
                                                                  |
@@ -34,18 +34,28 @@ DriveAlert AI is a proactive cognitive co-pilot designed to monitor commercial d
 ```
 
 ## Dataset Details
-The models have been trained and evaluated on three primary benchmark datasets for fatigue detection:
-- **YawDD (Yawning Detection Dataset):** Video clips of various drivers yawning under different conditions.
-- **UTA-RLDD (Real-Life Drowsiness Dataset):** Multi-stage drowsiness classification (Alert, Low Vigilance, Drowsy).
-- **DDD (Drowsiness Detection Dataset):** Diverse lighting and occlusion scenarios, critical for night-time and glasses-wearing driver detection.
 
-## Model Evaluation Benchmarks
+The current comparison uses the processed YawDD and UTA-RLDD driver data with participant-disjoint train, validation, and test splits. Labels are provisional weak labels, so the reported results support a college prototype and still require independent human and real-driving validation.
 
-| Model             | Accuracy | Inference Time (ms) | Params (M) | Notes                        |
-|-------------------|----------|---------------------|------------|------------------------------|
-| **MobileNetV2**   | 94.2%    | 12.5                | 3.4        | **Selected (Optimal Edge)**  |
-| **EfficientNet-B0**| 95.8%   | 18.2                | 5.3        | High accuracy, slightly slower|
-| **ResNet-18**     | 93.5%    | 25.1                | 11.2       | Baseline architecture        |
+The original videos, extracted frames, and local processed datasets are excluded from Git. See [Dataset Credits and Usage Notice](DATASET_CREDITS.md) for the required UTA-RLDD citation, the YawDD dataset and paper citations, official download links, privacy considerations, and the third-party licensing boundary.
+
+## Team Model Ownership
+
+| Member | Model | Why it was selected | Project purpose |
+|---|---|---|---|
+| **CB.SC.U4CSE23628** | **MobileNetV3-Small** | Smallest checkpoint and parameter count, with strong eye and mouth results | Deployment model for the live webcam demonstration |
+| **CB.SC.U4CSE23603** | **EfficientNet-B0** | Efficient compound scaling provides a stronger accuracy/capacity comparison | Middle-weight accuracy-efficiency challenger |
+| **CB.SC.U4CSE23717** | **ResNet-18** | A well-established residual CNN makes the experiment easy to explain and reproduce | Heavier reference model and accuracy ceiling |
+
+## Locked Test Comparison
+
+| Model | Parameters | Eye balanced accuracy | Mouth balanced accuracy | Deployment decision |
+|---|---:|---:|---:|---|
+| **MobileNetV3-Small** | **1.52 M** | 96.93% | 94.41% | **Selected for the webcam demo** |
+| **EfficientNet-B0** | 4.01 M | 96.53% | 94.07% | Comparison challenger |
+| **ResNet-18** | 11.18 M | **97.88%** | **95.57%** | Accuracy reference |
+
+MobileNetV3-Small is deployed because it uses roughly 7.4× fewer parameters than ResNet-18 while remaining close on balanced accuracy. The comparison window also shows AP, recall, specificity, precision, F1, locked thresholds, checkpoint sizes, and per-member ownership.
 
 ## Installation & Setup
 
@@ -64,13 +74,27 @@ The models have been trained and evaluated on three primary benchmark datasets f
    npm run dev
    ```
 
-### Backend Setup (Microservice)
-1. Navigate to the `backend/` directory.
-2. Install Python dependencies:
+### Backend Setup (Local Inference)
+
+1. From the project root, use the existing environment:
    ```bash
-   pip install -r requirements.txt
+   ./ml-env/bin/python backend/app.py
    ```
-3. Run the API service:
+2. If recreating the environment, install the backend dependencies first:
    ```bash
-   python app.py
+   python -m pip install -r backend/requirements.txt
    ```
+3. Then run the local API:
+   ```bash
+   python backend/app.py
+   ```
+
+Keep the backend terminal running, start the frontend in a second terminal with `npm run dev`, open the local address shown by Vite, and allow webcam access. Speed and continuous-drive time are intentionally simulated examiner controls. Rest-stop navigation uses a hardcoded offline demonstration map.
+
+## Demo Safety Note
+
+DriveAlert AI is a college prototype, not a certified automotive or medical safety device. The model results use provisional labels; the driver remains responsible for stopping safely and following applicable driving-hours rules.
+
+## License
+
+Original project code and documentation are available under the [MIT License](LICENSE). Third-party datasets are not included and are not covered by this license; see [Dataset Credits and Usage Notice](DATASET_CREDITS.md).
