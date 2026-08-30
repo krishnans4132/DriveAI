@@ -1,8 +1,5 @@
-Flask==3.0.0
-opencv-python==4.8.1.78
-torch==2.1.0
-torchvision==0.16.0
-numpy==1.26.0
-dlib==19.24.2
-scipy==1.11.3
-imutils==0.5.4
+mediapipe==0.10.20
+numpy==1.26.4
+opencv-contrib-python==4.11.0.86
+torch==2.13.0
+torchvision==0.28.0
