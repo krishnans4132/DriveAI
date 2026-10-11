@@ -1,0 +1,25 @@
+\begin{table}[htbp]
+\caption{Eye test results in percent on 3,918 crops. BA is balanced accuracy; precision and recall refer to closed eyes.}\label{tab:eye-results}
+\begin{tabularx}{\textwidth}{@{}Yrrrrr@{}}
+\toprule
+Architecture & AP & AUC & BA & Precision & Recall \\
+\midrule
+MobileNetV3-Small & 94.14 & 99.51 & 96.93 & 58.39 & 97.31 \\
+EfficientNet-B0 & 96.62 & 99.58 & 96.53 & 47.91 & 98.39 \\
+ResNet-18 & 96.41 & 99.62 & 97.88 & 65.12 & 98.39 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Mouth test results in percent on 2,847 crops. BA averages the three class recalls; precision and recall refer to yawns.}\label{tab:mouth-results}
+\begin{tabularx}{\textwidth}{@{}Yrrrrr@{}}
+\toprule
+Architecture & Macro AP & Macro F1 & BA & Precision & Recall \\
+\midrule
+MobileNetV3-Small & 98.33 & 95.02 & 94.41 & 96.95 & 91.04 \\
+EfficientNet-B0 & 98.37 & 94.95 & 94.07 & 98.41 & 88.89 \\
+ResNet-18 & 98.70 & 96.06 & 95.57 & 98.86 & 93.55 \\
+\bottomrule
+\end{tabularx}
+\end{table}

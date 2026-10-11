@@ -1,0 +1,130 @@
+{
+  "models": [
+    {
+      "architecture": "MobileNetV3-Small",
+      "task": "eye",
+      "parameters": 1518881,
+      "conv_linear_macs": 21047168,
+      "fp32_parameter_mib": 5.794071197509766,
+      "largest_conv_linear_output_elements": 82944
+    },
+    {
+      "architecture": "MobileNetV3-Small",
+      "task": "mouth",
+      "parameters": 1520931,
+      "conv_linear_macs": 17716288,
+      "fp32_parameter_mib": 5.801891326904297,
+      "largest_conv_linear_output_elements": 69120
+    },
+    {
+      "architecture": "EfficientNet-B0",
+      "task": "eye",
+      "parameters": 4008829,
+      "conv_linear_macs": 141655744,
+      "fp32_parameter_mib": 15.292469024658203,
+      "largest_conv_linear_output_elements": 442368
+    },
+    {
+      "architecture": "EfficientNet-B0",
+      "task": "mouth",
+      "parameters": 4011391,
+      "conv_linear_macs": 118153760,
+      "fp32_parameter_mib": 15.302242279052734,
+      "largest_conv_linear_output_elements": 368640
+    },
+    {
+      "architecture": "ResNet-18",
+      "task": "eye",
+      "parameters": 11177025,
+      "conv_linear_macs": 666206720,
+      "fp32_parameter_mib": 42.636966705322266,
+      "largest_conv_linear_output_elements": 294912
+    },
+    {
+      "architecture": "ResNet-18",
+      "task": "mouth",
+      "parameters": 11178051,
+      "conv_linear_macs": 555173376,
+      "fp32_parameter_mib": 42.6408805847168,
+      "largest_conv_linear_output_elements": 245760
+    }
+  ],
+  "latency": {
+    "measurement": "Pair of deployed PyTorch CPU classifiers plus crop normalization; synthetic uint8 crops; excludes face detection, JPEG/API and browser",
+    "cpu": "Apple M4",
+    "torch_version": "2.13.0",
+    "threads": 4,
+    "warmup": 20,
+    "runs": 100,
+    "median_ms": 94.31385350762866,
+    "p95_ms": 99.66019378625786,
+    "mean_ms": 96.42415327893104
+  },
+  "split_counts": {
+    "eye": {
+      "train": {
+        "samples": 16940,
+        "participants": 104,
+        "classes": {
+          "closed": 806,
+          "open": 16134
+        }
+      },
+      "val": {
+        "samples": 3572,
+        "participants": 23,
+        "classes": {
+          "closed": 279,
+          "open": 3293
+        }
+      },
+      "test": {
+        "samples": 3918,
+        "participants": 23,
+        "classes": {
+          "closed": 186,
+          "open": 3732
+        }
+      },
+      "participant_overlaps": {
+        "train_val": 0,
+        "train_test": 0,
+        "val_test": 0
+      }
+    },
+    "mouth": {
+      "train": {
+        "samples": 12023,
+        "participants": 62,
+        "classes": {
+          "not_yawn": 6434,
+          "talking": 4403,
+          "yawn": 1186
+        }
+      },
+      "val": {
+        "samples": 2884,
+        "participants": 14,
+        "classes": {
+          "not_yawn": 1475,
+          "talking": 1105,
+          "yawn": 304
+        }
+      },
+      "test": {
+        "samples": 2847,
+        "participants": 14,
+        "classes": {
+          "not_yawn": 1633,
+          "talking": 935,
+          "yawn": 279
+        }
+      },
+      "participant_overlaps": {
+        "train_val": 0,
+        "train_test": 0,
+        "val_test": 0
+      }
+    }
+  }
+}
