@@ -95,9 +95,9 @@ Two tasks are evaluated:
 
 | Architecture | Parameters | Eye ONNX | Eye balanced accuracy | Closed-eye recall | Mouth balanced accuracy | Yawn recall |
 |---|---:|---:|---:|---:|---:|---:|
-| **MobileNetV3-Small** | **1.52 M** | **5.80 MiB** | 96.93% | 97.31% | 94.41% | 91.04% |
-| **EfficientNet-B0** | 4.01 M | 15.28 MiB | 96.53% | **98.39%** | 94.07% | 88.89% |
-| **ResNet-18** | 11.18 M | 42.63 MiB | **97.88%** | **98.39%** | **95.57%** | **93.55%** |
+| **MobileNetV3-Small** | **1.52 M** | **5.80 MiB** | 96.87% | 97.31% | 94.38% | 91.04% |
+| **EfficientNet-B0** | 4.01 M | 15.28 MiB | 96.57% | **98.39%** | 94.05% | 88.89% |
+| **ResNet-18** | 11.18 M | 42.63 MiB | **97.89%** | **98.39%** | **95.59%** | **93.55%** |
 
 The interactive comparison page additionally reports average precision, specificity, precision, F1, yawn balanced accuracy, validation-locked thresholds, checkpoint size, and model ownership.
 
@@ -301,6 +301,22 @@ python -m unittest discover -s backend/tests -v
 ```
 
 The backend suite currently covers temporal accumulation, sustained-closure escalation, PERCLOS validity, yawn-event counting, non-monotonic timestamps, speed and drive-time sensitivity, preprocessing, checkpoint loading, and probability output.
+
+### Re-evaluate the three trained models
+
+Use the untouched participant-disjoint `test` split for a controlled, back-to-back comparison. The script verifies there is no participant overlap across train, validation, and test, uses the validation-locked eye/yawn thresholds already deployed by the application, and reports model-only inference latency. It also reports eye metrics separately for UTA-RLDD and YawDD to expose source-dependent performance. It never tunes thresholds on test data.
+
+The processed dataset is intentionally not included in this repository. Make sure you have the `drivealert-processed-3` package used by the notebooks, with `splits/` and `images/` under its root, then run:
+
+```bash
+source .venv/bin/activate
+python ml/scripts/evaluate_models.py \
+  --dataset-dir "/path/to/drivealert-processed-3"
+```
+
+To use CPU explicitly, add `--device cpu`; CUDA is selected automatically when available. Results are written to `ml/evaluation/`: one metrics JSON and six row-level prediction CSVs (eye and mouth, for each architecture). Metrics are comparable only when they use the same test package and split. The framework also recommends natural robustness evaluation across varied operating conditions; this script's source breakdown is an initial check, while lighting, pose, eyewear, and occlusion should be captured and labeled as separate scenario data before making robustness claims.
+
+**Interpretation:** this repository's test labels are marked as provisional weak labels, not independent ground truth. The script records that status in the JSON. Treat its results as a reproducible model comparison, not proof of real-world driver-fatigue accuracy; human-reviewed labels and representative webcam/real-driving evaluation are still needed.
 
 ## ML Workflow and Repository Structure
 

@@ -1,0 +1,365 @@
+{
+  "evaluation": "participant-disjoint held-out test; back-to-back comparison",
+  "dataset_dir": "ml/processed_data_v2 (local processed dataset)",
+  "device": "cpu",
+  "thresholds_selected_on_test": false,
+  "labels_are_ground_truth": false,
+  "label_status": "provisional weak labels",
+  "participant_disjoint_verified": true,
+  "models": {
+    "mobilenet": {
+      "architecture": "MobileNetV3-Small",
+      "eye": {
+        "inference_latency_ms_per_image": 17.537799472638916,
+        "throughput_images_per_second": 57.01969631709614,
+        "metrics": {
+          "samples": 3918,
+          "threshold": 0.06,
+          "average_precision": 0.9421000019834183,
+          "roc_auc": 0.9951019373278475,
+          "balanced_accuracy": 0.9687402759049891,
+          "positive_precision": 0.5764331210191083,
+          "positive_recall": 0.9731182795698925,
+          "negative_specificity": 0.9643622722400857,
+          "positive_f1": 0.724,
+          "tp": 181,
+          "fp": 133,
+          "tn": 3599,
+          "fn": 5
+        },
+        "metrics_by_dataset": {
+          "uta_rldd": {
+            "samples": 2138,
+            "threshold": 0.06,
+            "average_precision": 0.938132295452278,
+            "roc_auc": 0.9962621920728165,
+            "balanced_accuracy": 0.974757168762028,
+            "positive_precision": 0.5393258426966292,
+            "positive_recall": 0.9896907216494846,
+            "negative_specificity": 0.9598236158745713,
+            "positive_f1": 0.6981818181818182,
+            "tp": 96,
+            "fp": 82,
+            "tn": 1959,
+            "fn": 1
+          },
+          "yawdd": {
+            "samples": 1780,
+            "threshold": 0.06,
+            "average_precision": 0.9469978661391102,
+            "roc_auc": 0.9938139123847999,
+            "balanced_accuracy": 0.962448255470136,
+            "positive_precision": 0.625,
+            "positive_recall": 0.9550561797752809,
+            "negative_specificity": 0.9698403311649911,
+            "positive_f1": 0.7555555555555556,
+            "tp": 85,
+            "fp": 51,
+            "tn": 1640,
+            "fn": 4
+          }
+        }
+      },
+      "mouth": {
+        "inference_latency_ms_per_image": 16.05327202628383,
+        "throughput_images_per_second": 62.29259669696693,
+        "decision_threshold_yawn": 0.355,
+        "metrics": {
+          "samples": 2847,
+          "macro_average_precision": 0.9832324864105452,
+          "macro_roc_auc": 0.9912329613770101,
+          "macro_f1": 0.9497115456115456,
+          "balanced_accuracy": 0.9438335742080494,
+          "accuracy": 0.9585528626624517,
+          "per_class": {
+            "not_yawn": {
+              "support": 1633,
+              "average_precision": 0.9949202697410923,
+              "precision": 0.9760295021511985,
+              "recall": 0.9724433557868953,
+              "f1": 0.9742331288343559
+            },
+            "talking": {
+              "support": 935,
+              "average_precision": 0.9772213477465969,
+              "precision": 0.9268547544409613,
+              "recall": 0.948663101604278,
+              "f1": 0.9376321353065538
+            },
+            "yawn": {
+              "support": 279,
+              "average_precision": 0.9775558417439463,
+              "precision": 0.9657794676806084,
+              "recall": 0.910394265232975,
+              "f1": 0.9372693726937271
+            }
+          },
+          "yawn_vs_rest": {
+            "precision": 0.9657794676806084,
+            "recall": 0.910394265232975,
+            "specificity": 0.9964953271028038,
+            "f1": 0.9372693726937271,
+            "balanced_accuracy": 0.9534447961678894,
+            "tp": 254,
+            "fp": 9,
+            "tn": 2559,
+            "fn": 25
+          },
+          "confusion_matrix_rows_true_columns_predicted": [
+            [
+              1588,
+              45,
+              0
+            ],
+            [
+              39,
+              887,
+              9
+            ],
+            [
+              0,
+              25,
+              254
+            ]
+          ]
+        }
+      }
+    },
+    "efficientnet": {
+      "architecture": "EfficientNet-B0",
+      "eye": {
+        "inference_latency_ms_per_image": 56.076811734560096,
+        "throughput_images_per_second": 17.83268286958798,
+        "metrics": {
+          "samples": 3918,
+          "threshold": 0.04,
+          "average_precision": 0.9661540455697182,
+          "roc_auc": 0.9957242794085446,
+          "balanced_accuracy": 0.9656761055215572,
+          "positive_precision": 0.48284960422163586,
+          "positive_recall": 0.9838709677419355,
+          "negative_specificity": 0.947481243301179,
+          "positive_f1": 0.647787610619469,
+          "tp": 183,
+          "fp": 196,
+          "tn": 3536,
+          "fn": 3
+        },
+        "metrics_by_dataset": {
+          "uta_rldd": {
+            "samples": 2138,
+            "threshold": 0.04,
+            "average_precision": 0.9707166564125438,
+            "roc_auc": 0.9952873313566728,
+            "balanced_accuracy": 0.9632331028351778,
+            "positive_precision": 0.46798029556650245,
+            "positive_recall": 0.979381443298969,
+            "negative_specificity": 0.9470847623713866,
+            "positive_f1": 0.6333333333333333,
+            "tp": 95,
+            "fp": 108,
+            "tn": 1933,
+            "fn": 2
+          },
+          "yawdd": {
+            "samples": 1780,
+            "threshold": 0.04,
+            "average_precision": 0.9627879387416683,
+            "roc_auc": 0.9961262201077749,
+            "balanced_accuracy": 0.9683619160260202,
+            "positive_precision": 0.5,
+            "positive_recall": 0.9887640449438202,
+            "negative_specificity": 0.94795978710822,
+            "positive_f1": 0.6641509433962264,
+            "tp": 88,
+            "fp": 88,
+            "tn": 1603,
+            "fn": 1
+          }
+        }
+      },
+      "mouth": {
+        "inference_latency_ms_per_image": 53.63253538995166,
+        "throughput_images_per_second": 18.645398594886405,
+        "decision_threshold_yawn": 0.605,
+        "metrics": {
+          "samples": 2847,
+          "macro_average_precision": 0.9837664184529054,
+          "macro_roc_auc": 0.9925768069787063,
+          "macro_f1": 0.9491843004069523,
+          "balanced_accuracy": 0.9404803652921516,
+          "accuracy": 0.9585528626624517,
+          "per_class": {
+            "not_yawn": {
+              "support": 1633,
+              "average_precision": 0.9939342533081392,
+              "precision": 0.9819427148194272,
+              "recall": 0.9657072872014697,
+              "f1": 0.973757332510034
+            },
+            "talking": {
+              "support": 935,
+              "average_precision": 0.9750923592943961,
+              "precision": 0.9140546006066734,
+              "recall": 0.9668449197860962,
+              "f1": 0.9397089397089398
+            },
+            "yawn": {
+              "support": 279,
+              "average_precision": 0.9822726427561805,
+              "precision": 0.9841269841269841,
+              "recall": 0.8888888888888888,
+              "f1": 0.9340866290018832
+            }
+          },
+          "yawn_vs_rest": {
+            "precision": 0.9841269841269841,
+            "recall": 0.8888888888888888,
+            "specificity": 0.9984423676012462,
+            "f1": 0.9340866290018832,
+            "balanced_accuracy": 0.9436656282450675,
+            "tp": 248,
+            "fp": 4,
+            "tn": 2564,
+            "fn": 31
+          },
+          "confusion_matrix_rows_true_columns_predicted": [
+            [
+              1577,
+              56,
+              0
+            ],
+            [
+              27,
+              904,
+              4
+            ],
+            [
+              2,
+              29,
+              248
+            ]
+          ]
+        }
+      }
+    },
+    "resnet": {
+      "architecture": "ResNet-18",
+      "eye": {
+        "inference_latency_ms_per_image": 13.046576240939773,
+        "throughput_images_per_second": 76.64846175213611,
+        "metrics": {
+          "samples": 3918,
+          "threshold": 0.025,
+          "average_precision": 0.9643755129857736,
+          "roc_auc": 0.9961910359690673,
+          "balanced_accuracy": 0.9789397711164125,
+          "positive_precision": 0.6535714285714286,
+          "positive_recall": 0.9838709677419355,
+          "negative_specificity": 0.9740085744908896,
+          "positive_f1": 0.7854077253218885,
+          "tp": 183,
+          "fp": 97,
+          "tn": 3635,
+          "fn": 3
+        },
+        "metrics_by_dataset": {
+          "uta_rldd": {
+            "samples": 2138,
+            "threshold": 0.025,
+            "average_precision": 0.9780749906727583,
+            "roc_auc": 0.9985755921142355,
+            "balanced_accuracy": 0.9811366976972072,
+            "positive_precision": 0.5574712643678161,
+            "positive_recall": 1.0,
+            "negative_specificity": 0.9622733953944145,
+            "positive_f1": 0.7158671586715868,
+            "tp": 97,
+            "fp": 77,
+            "tn": 1964,
+            "fn": 0
+          },
+          "yawdd": {
+            "samples": 1780,
+            "threshold": 0.025,
+            "average_precision": 0.9671499175127706,
+            "roc_auc": 0.9958537930484588,
+            "balanced_accuracy": 0.9772324068598462,
+            "positive_precision": 0.8113207547169812,
+            "positive_recall": 0.9662921348314607,
+            "negative_specificity": 0.9881726788882318,
+            "positive_f1": 0.882051282051282,
+            "tp": 86,
+            "fp": 20,
+            "tn": 1671,
+            "fn": 3
+          }
+        }
+      },
+      "mouth": {
+        "inference_latency_ms_per_image": 12.859820864427656,
+        "throughput_images_per_second": 77.76158086044276,
+        "decision_threshold_yawn": 0.65,
+        "metrics": {
+          "samples": 2847,
+          "macro_average_precision": 0.9870923192816378,
+          "macro_roc_auc": 0.9939638508041919,
+          "macro_f1": 0.960908781893878,
+          "balanced_accuracy": 0.9558624811145463,
+          "accuracy": 0.964172813487882,
+          "per_class": {
+            "not_yawn": {
+              "support": 1633,
+              "average_precision": 0.9939136738555193,
+              "precision": 0.9796044499381953,
+              "recall": 0.9706062461726883,
+              "f1": 0.9750845893571208
+            },
+            "talking": {
+              "support": 935,
+              "average_precision": 0.9802738388745079,
+              "precision": 0.9316062176165804,
+              "recall": 0.9614973262032086,
+              "f1": 0.9463157894736842
+            },
+            "yawn": {
+              "support": 279,
+              "average_precision": 0.987089445114886,
+              "precision": 0.9886363636363636,
+              "recall": 0.9354838709677419,
+              "f1": 0.9613259668508287
+            }
+          },
+          "yawn_vs_rest": {
+            "precision": 0.9886363636363636,
+            "recall": 0.9354838709677419,
+            "specificity": 0.9988317757009346,
+            "f1": 0.9613259668508287,
+            "balanced_accuracy": 0.9671578233343383,
+            "tp": 261,
+            "fp": 3,
+            "tn": 2565,
+            "fn": 18
+          },
+          "confusion_matrix_rows_true_columns_predicted": [
+            [
+              1585,
+              48,
+              0
+            ],
+            [
+              33,
+              899,
+              3
+            ],
+            [
+              0,
+              18,
+              261
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

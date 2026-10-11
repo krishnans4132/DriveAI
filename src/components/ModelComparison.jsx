@@ -172,6 +172,58 @@ const ModelComparison = ({ onBack, onLaunch }) => {
         </div>
       </section>
 
+      <section className="comparison-section evaluation-strategy-section">
+        <div className="section-heading">
+          <div>
+            <span className="section-kicker"><ShieldCheck size={15} /> Test methodology</span>
+            <h2>Test and evaluation strategy</h2>
+          </div>
+          <p>
+            We used a participant-disjoint held-out test and back-to-back model
+            comparison: all three architectures were evaluated on the same test
+            images with thresholds fixed on validation data.
+          </p>
+        </div>
+
+        <div className="evaluation-strategy-grid">
+          <article className="evaluation-strategy-card">
+            <span className="strategy-index">01 · TEST DESIGN</span>
+            <h3>Participant-disjoint holdout</h3>
+            <p>
+              Drivers in the train, validation and test splits do not overlap.
+              The held-out test split contains 3,918 eye crops and 2,847 mouth crops.
+            </p>
+          </article>
+          <article className="evaluation-strategy-card">
+            <span className="strategy-index">02 · COMPARISON METHOD</span>
+            <h3>Back-to-back testing</h3>
+            <p>
+              MobileNetV3-Small, EfficientNet-B0 and ResNet-18 received the same
+              held-out examples. Validation-selected thresholds stayed fixed;
+              the test set was not used to tune them.
+            </p>
+          </article>
+          <article className="evaluation-strategy-card">
+            <span className="strategy-index">03 · ROBUSTNESS CHECK</span>
+            <h3>Dataset-source breakdown</h3>
+            <p>
+              Eye results were reported separately for UTA-RLDD and YawDD as an
+              initial natural-variation check. Mouth test data in this package
+              comes from YawDD only.
+            </p>
+          </article>
+          <article className="evaluation-strategy-card evaluation-strategy-card--note">
+            <span className="strategy-index">04 · METRICS & LIMITS</span>
+            <h3>Safety-focused reporting</h3>
+            <p>
+              We report balanced accuracy, average precision, precision, recall,
+              specificity, F1 and confusion counts. Labels are provisional weak
+              labels, so these results need independent human validation.
+            </p>
+          </article>
+        </div>
+      </section>
+
       <section className="comparison-section results-section">
         <div className="section-heading results-heading">
           <div>
@@ -217,7 +269,7 @@ const ModelComparison = ({ onBack, onLaunch }) => {
               <Trophy size={23} />
               <span>Metric leader</span>
               <h3>ResNet-18</h3>
-              <p>{activeTask === 'eye' ? '97.88% balanced accuracy' : '96.72% yawn balanced accuracy'}</p>
+              <p>{activeTask === 'eye' ? '97.89% balanced accuracy' : '96.72% yawn balanced accuracy'}</p>
             </div>
             <div className="insight-card">
               <Gauge size={23} />

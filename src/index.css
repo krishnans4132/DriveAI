@@ -993,6 +993,53 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
   padding-top: 96px;
 }
 
+.evaluation-strategy-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.evaluation-strategy-card {
+  min-height: 225px;
+  padding: 23px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  background:
+    linear-gradient(150deg, rgba(0, 229, 255, 0.055), transparent 58%),
+    rgba(15, 28, 40, 0.78);
+}
+
+.strategy-index {
+  color: var(--accent-cyan);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+}
+
+.evaluation-strategy-card h3 {
+  margin: 20px 0 10px;
+  font-size: 1.08rem;
+  letter-spacing: -0.025em;
+}
+
+.evaluation-strategy-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.evaluation-strategy-card--note {
+  border-color: rgba(181, 139, 255, 0.18);
+  background:
+    linear-gradient(150deg, rgba(181, 139, 255, 0.07), transparent 58%),
+    rgba(15, 28, 40, 0.78);
+}
+
+.evaluation-strategy-card--note .strategy-index {
+  color: var(--accent-purple);
+}
+
 .section-heading {
   display: flex;
   align-items: end;
@@ -1466,6 +1513,10 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 }
 
 @media (max-width: 1050px) {
+  .evaluation-strategy-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .simulator-layout {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto auto;
@@ -1559,6 +1610,10 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 
   .comparison-section {
     padding-top: 72px;
+  }
+
+  .evaluation-strategy-grid {
+    grid-template-columns: 1fr;
   }
 
   .section-heading,
