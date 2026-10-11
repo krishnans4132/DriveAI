@@ -17,11 +17,13 @@ import numpy as np
 
 try:
     from .detect_fatigue import FatigueDetector
-    from .model_runtime import MobileNetFatigueRuntime
+    from .model_runtime import DEFAULT_MODEL, MODEL_CONFIGS, FatigueModelRuntime, available_models
+    from .fatigue_engine import FatigueConfig
     from .vision import FaceRegionExtractor
 except ImportError:
     from detect_fatigue import FatigueDetector
-    from model_runtime import MobileNetFatigueRuntime
+    from model_runtime import DEFAULT_MODEL, MODEL_CONFIGS, FatigueModelRuntime, available_models
+    from fatigue_engine import FatigueConfig
     from vision import FaceRegionExtractor
 
 
@@ -30,10 +32,12 @@ MAX_REQUEST_BYTES = 3 * 1024 * 1024
 
 class DriveAlertService:
     def __init__(self) -> None:
-        self.runtime = MobileNetFatigueRuntime()
+        self.runtimes: dict[str, FatigueModelRuntime] = {}
+        self._runtime_lock = Lock()
         self.vision = FaceRegionExtractor()
         self._sessions: dict[str, FatigueDetector] = {}
         self._session_timestamps: dict[str, float] = {}
+        self._session_models: dict[str, str] = {}
         self._lock = Lock()
 
     def status(self) -> dict[str, object]:
@@ -41,19 +45,32 @@ class DriveAlertService:
             "status": "running",
             "message": "DriveAlert AI local inference is online",
             "face_extractor": self.vision.backend,
-            **self.runtime.metadata,
+            "default_model": DEFAULT_MODEL,
+            "available_models": available_models(),
         }
 
     def reset(self, session_id: str) -> dict[str, object]:
         with self._lock:
             self._sessions.pop(session_id, None)
             self._session_timestamps.pop(session_id, None)
+            self._session_models.pop(session_id, None)
         return {"status": "reset", "session_id": session_id}
 
-    def _detector_and_timestamp(self, session_id: str) -> tuple[FatigueDetector, float]:
+    def _detector_and_timestamp(self, session_id: str, model_key: str) -> tuple[FatigueDetector, float]:
         now = time.monotonic()
         with self._lock:
-            detector = self._sessions.setdefault(session_id, FatigueDetector())
+            if self._session_models.get(session_id) != model_key:
+                self._sessions.pop(session_id, None)
+                self._session_timestamps.pop(session_id, None)
+                self._session_models[session_id] = model_key
+            config = MODEL_CONFIGS[model_key]
+            detector = self._sessions.setdefault(
+                session_id,
+                FatigueDetector(FatigueConfig(
+                    eye_closed_probability_threshold=config["eye_threshold"],
+                    yawn_probability_threshold=config["yawn_threshold"],
+                )),
+            )
             previous = self._session_timestamps.get(session_id)
             timestamp = now if previous is None else max(now, previous + 0.001)
             self._session_timestamps[session_id] = timestamp
@@ -61,6 +78,11 @@ class DriveAlertService:
 
     def analyze(self, payload: dict[str, Any]) -> dict[str, object]:
         session_id = str(payload.get("session_id", "default"))[:100]
+        model_key = str(payload.get("model", DEFAULT_MODEL))
+        if model_key not in MODEL_CONFIGS:
+            raise ValueError(f"Unknown model: {model_key}")
+        if not any(item["key"] == model_key and item["available"] for item in available_models()):
+            raise ValueError(f"{MODEL_CONFIGS[model_key]['name']} weights are not available")
         speed_kph = _bounded_number(payload.get("speed_kph", 0), 0, 240, "speed_kph")
         drive_minutes = _bounded_number(
             payload.get("continuous_drive_minutes", 0), 0, 24 * 60,
@@ -72,7 +94,12 @@ class DriveAlertService:
 
         prediction: dict[str, object]
         if regions.face_detected and regions.eye and regions.mouth:
-            prediction = self.runtime.predict(regions.eye.image, regions.mouth.image)
+            with self._runtime_lock:
+                runtime = self.runtimes.get(model_key)
+                if runtime is None:
+                    runtime = FatigueModelRuntime(model_key)
+                    self.runtimes[model_key] = runtime
+            prediction = runtime.predict(regions.eye.image, regions.mouth.image)
         else:
             prediction = {
                 "eye_closed_probability": None,
@@ -82,7 +109,7 @@ class DriveAlertService:
                 "yawn_probability": None,
             }
 
-        detector, timestamp = self._detector_and_timestamp(session_id)
+        detector, timestamp = self._detector_and_timestamp(session_id, model_key)
         decision = detector.analyze_observation(
             timestamp_s=timestamp,
             eye_closed_probability=prediction["eye_closed_probability"],
@@ -192,7 +219,7 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5000)
     args = parser.parse_args()
-    print("Loading DriveAlert MobileNetV3-Small eye and mouth checkpoints...")
+    print("DriveAlert models will load on first use (MobileNetV3-Small, EfficientNet-B0, ResNet-18)...")
     server = create_server(args.host, args.port)
     print(f"DriveAlert API ready at http://{args.host}:{args.port}")
     try:

@@ -504,6 +504,9 @@ input[type=range]::-webkit-slider-thumb {
   letter-spacing: 0.08em;
 }
 .live-chip { color: #ff6387; }
+.camera-controls { display: flex; align-items: flex-start; gap: 8px; }
+.camera-model-picker { display: inline-flex; align-items: center; gap: 7px; min-height: 33px; padding: 0 9px; color: var(--accent-cyan); border: 1px solid rgba(255,255,255,.11); border-radius: 9px; background: rgba(3,11,16,.78); backdrop-filter: blur(12px); font-size: .58rem; font-weight: 850; letter-spacing: .08em; }
+.camera-model-picker select { max-width: 190px; padding: 5px 7px; color: #e4f2f7; border: 0; border-radius: 6px; outline: 0; background: #111e28; font: inherit; font-size: .65rem; letter-spacing: 0; cursor: pointer; }
 .connection-chip--online { color: var(--accent-green); }
 .connection-chip--offline { color: #ffbd66; }
 .connection-chip--checking { color: var(--accent-cyan); }

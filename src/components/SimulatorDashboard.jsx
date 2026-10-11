@@ -20,6 +20,7 @@ const SimulatorDashboard = ({ onBack }) => {
   const [isRerouting, setIsRerouting] = useState(false);
   const [showBoundingBox, setShowBoundingBox] = useState(false);
   const [analysis, setAnalysis] = useState(null);
+  const [selectedModel, setSelectedModel] = useState('mobilenet');
   const [resetToken, setResetToken] = useState(0);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const voiceSupported = speechIsSupported();
@@ -93,6 +94,8 @@ const SimulatorDashboard = ({ onBack }) => {
       <DashcamView
         speed={speed}
         shiftTime={shiftTime}
+        selectedModel={selectedModel}
+        onModelChange={(model) => setSelectedModel(model)}
         showBoundingBox={showBoundingBox}
         resetToken={resetToken}
         onAnalysis={handleAnalysis}

@@ -5,12 +5,15 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
 const SESSION_ID = `drivealert-${Math.random().toString(36).slice(2)}`;
 const probability = (value) => value == null ? '—' : `${(value * 100).toFixed(1)}%`;
 
-const DashcamView = ({ speed, shiftTime, showBoundingBox, resetToken, onAnalysis }) => {
+const modelNames = { mobilenet: 'MobileNetV3-Small', efficientnet: 'EfficientNet-B0', resnet: 'ResNet-18' };
+
+const DashcamView = ({ speed, shiftTime, selectedModel, onModelChange, showBoundingBox, resetToken, onAnalysis }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const busyRef = useRef(false);
   const idleRef = useRef(false);
+  const selectedModelRef = useRef(selectedModel);
   const telemetryRef = useRef({ speed, shiftTime });
   const analysisCallbackRef = useRef(onAnalysis);
   const [cameraState, setCameraState] = useState('requesting');
@@ -18,8 +21,14 @@ const DashcamView = ({ speed, shiftTime, showBoundingBox, resetToken, onAnalysis
   const [analysis, setAnalysis] = useState(null);
   const [cameraError, setCameraError] = useState('');
 
+  selectedModelRef.current = selectedModel;
   useEffect(() => { telemetryRef.current = { speed, shiftTime }; }, [speed, shiftTime]);
   useEffect(() => { analysisCallbackRef.current = onAnalysis; }, [onAnalysis]);
+
+  useEffect(() => {
+    setAnalysis(null);
+    analysisCallbackRef.current?.(null);
+  }, [selectedModel]);
 
   useEffect(() => {
     if (speed === 0) {
@@ -113,6 +122,7 @@ const DashcamView = ({ speed, shiftTime, showBoundingBox, resetToken, onAnalysis
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             session_id: SESSION_ID,
+            model: selectedModel,
             frame: canvas.toDataURL('image/jpeg', 0.72),
             speed_kph: current.speed,
             continuous_drive_minutes: current.shiftTime * 60,
@@ -120,12 +130,12 @@ const DashcamView = ({ speed, shiftTime, showBoundingBox, resetToken, onAnalysis
         });
         if (!response.ok) throw new Error(`Inference request failed (${response.status})`);
         const result = await response.json();
-        if (telemetryRef.current.speed === 0) return;
+        if (telemetryRef.current.speed === 0 || selectedModelRef.current !== selectedModel) return;
         setApiState('online');
         setAnalysis(result);
         analysisCallbackRef.current?.(result);
       } catch (error) {
-        setApiState('offline');
+        if (selectedModelRef.current === selectedModel) setApiState('offline');
       } finally {
         busyRef.current = false;
       }
@@ -133,7 +143,7 @@ const DashcamView = ({ speed, shiftTime, showBoundingBox, resetToken, onAnalysis
     analyzeFrame();
     const interval = window.setInterval(analyzeFrame, 700);
     return () => window.clearInterval(interval);
-  }, [cameraState]);
+  }, [cameraState, selectedModel]);
 
   const boxStyle = (box) => box ? {
     left: `${(1 - box.x - box.width) * 100}%`,
@@ -167,15 +177,26 @@ const DashcamView = ({ speed, shiftTime, showBoundingBox, resetToken, onAnalysis
       {showBoundingBox && <div className="vision-box vision-box--demo"><span>examiner scenario</span></div>}
       <div className="camera-topbar">
         <div className="live-chip"><span /> LIVE DRIVER CAMERA</div>
-        <div className={`connection-chip connection-chip--${isIdle ? 'idle' : apiState}`}>
-          {isIdle ? <PauseCircle size={14} /> : apiState === 'online' ? <Wifi size={14} /> : <WifiOff size={14} />}
-          {isIdle ? 'MODEL IDLE · VEHICLE STOPPED' : apiState === 'online' ? 'MODEL CONNECTED' : apiState === 'checking' ? 'CONNECTING' : 'START LOCAL API'}
+        <div className="camera-controls">
+          <label className="camera-model-picker" htmlFor="camera-model-select">
+            <Cpu size={14} />
+            <span>MODEL</span>
+            <select id="camera-model-select" value={selectedModel} onChange={(event) => onModelChange(event.target.value)} aria-label="Select live vision model">
+              <option value="mobilenet">MobileNetV3-Small</option>
+              <option value="efficientnet">EfficientNet-B0</option>
+              <option value="resnet">ResNet-18</option>
+            </select>
+          </label>
+          <div className={`connection-chip connection-chip--${isIdle ? 'idle' : apiState}`}>
+            {isIdle ? <PauseCircle size={14} /> : apiState === 'online' ? <Wifi size={14} /> : <WifiOff size={14} />}
+            {isIdle ? 'MODEL IDLE · VEHICLE STOPPED' : apiState === 'online' ? 'MODEL CONNECTED' : apiState === 'checking' ? 'CONNECTING' : 'START LOCAL API'}
+          </div>
         </div>
       </div>
       <div className="vision-hud">
         <div className="hud-model">
           <span className="hud-icon"><Cpu size={18} /></span>
-          <div><small>Deployed model</small><strong>MobileNetV3-Small</strong></div>
+          <div><small>Active vision model</small><strong>{modelNames[selectedModel]}</strong></div>
         </div>
         <div className="hud-reading">
           <Eye size={16} /><div><small>Eye closed</small><strong>{isIdle ? 'idle' : probability(analysis?.model?.eye_closed_probability)}</strong></div>

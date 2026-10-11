@@ -2,7 +2,7 @@
 
 **Real-time driver fatigue and microsleep monitoring with adaptive risk assessment and proactive rest intervention.**
 
-DriveAlert AI is a college research prototype that uses a normal webcam, two trained MobileNetV3-Small classifiers, and a deterministic temporal safety engine to monitor eye closure and yawning. The system combines visual evidence with simulated vehicle speed and continuous-drive time, displays the progress toward each alert threshold, issues browser text-to-speech warnings, and offers a hardcoded demonstration route to a rest stop.
+DriveAlert AI is a college research prototype that uses a normal webcam, trained MobileNetV3-Small, EfficientNet-B0, or ResNet-18 eye and mouth classifiers, and a deterministic temporal safety engine to monitor eye closure and yawning. The live monitor lets the examiner switch architectures while running. The system combines visual evidence with simulated vehicle speed and continuous-drive time, displays the progress toward each alert threshold, issues browser text-to-speech warnings, and offers a hardcoded demonstration route to a rest stop.
 
 The repository also contains a controlled comparison of MobileNetV3-Small, EfficientNet-B0, and ResNet-18 using the same participant-disjoint evaluation protocol.
 
@@ -30,7 +30,7 @@ The repository also contains a controlled comparison of MobileNetV3-Small, Effic
 | Three-model research comparison | Implemented | Interactive eye and mouth metric comparison |
 | Real webcam capture | Implemented | Uses browser camera permission |
 | Eye and mouth region extraction | Implemented | MediaPipe Face Mesh with an OpenCV fallback |
-| MobileNetV3-Small live inference | Implemented | Separate eye-state and mouth-event checkpoints |
+| Three-architecture live inference | Implemented | Select MobileNetV3-Small, EfficientNet-B0, or ResNet-18 in the live monitor |
 | Temporal fatigue engine | Implemented and tested | PERCLOS, sustained closure, repeated yawns, sensor validity |
 | Speed-adaptive sensitivity | Implemented | Simulated speed changes temporal alert thresholds |
 | Continuous-drive sensitivity | Implemented | Simulated drive duration increases vigilance |
@@ -39,7 +39,7 @@ The repository also contains a controlled comparison of MobileNetV3-Small, Effic
 | Rest-stop rerouting | Simulated | Hardcoded offline map to “Lakeside Rest Plaza” |
 | Vehicle telemetry connection | Simulated | Speed and drive duration are examiner-controlled |
 
-Only MobileNetV3-Small is loaded by the live application. EfficientNet-B0 and ResNet-18 remain research comparison models represented by their notebooks and compact evaluation reports.
+All three model families can be selected in the live application. Each architecture uses its own trained eye and mouth checkpoints and its validation-locked thresholds. The EfficientNet-B0 and ResNet-18 checkpoints are unpacked from the included artifact bundles into `ml/models/`.
 
 ## Key Features and Novelty
 
@@ -115,7 +115,7 @@ Local HTTP API ──► MediaPipe Face Mesh / OpenCV fallback
       │                         │
       │                    eye and mouth crops
       ▼                         ▼
-MobileNetV3-Small eye head + MobileNetV3-Small mouth head
+Selected eye head + selected mouth head (MobileNetV3-Small, EfficientNet-B0, or ResNet-18)
       │
       │ probabilities + simulated speed + continuous-drive time
       ▼
@@ -138,17 +138,18 @@ Live dashboard ──► alert queue ──► spoken intervention ──► sim
 | Frontend | React 18, Vite, Lucide icons, browser MediaDevices and Speech Synthesis APIs |
 | Local API | Python standard-library HTTP server |
 | Vision | MediaPipe, OpenCV, NumPy |
-| Inference | PyTorch, TorchVision, MobileNetV3-Small |
+| Inference | PyTorch, TorchVision, MobileNetV3-Small, EfficientNet-B0, ResNet-18 |
 | Evaluation | Jupyter notebooks, CSV histories, model cards, locked-threshold reports |
 
 ## Fatigue Decision Logic
 
 The neural-network thresholds were selected on validation data and remain fixed during inference:
 
-| Model signal | Locked threshold |
-|---|---:|
-| Eye closed probability | `0.060` |
-| Yawn probability | `0.355` |
+| Architecture | Eye closed probability | Yawn probability |
+|---|---:|---:|
+| MobileNetV3-Small | `0.060` | `0.355` |
+| EfficientNet-B0 | `0.040` | `0.605` |
+| ResNet-18 | `0.025` | `0.650` |
 
 The temporal engine then evaluates the following configurable defaults:
 
@@ -207,7 +208,7 @@ On Windows PowerShell, activate the environment with:
 .venv\Scripts\Activate.ps1
 ```
 
-The deployed MobileNet checkpoints are already stored under `ml/models/`. Raw datasets are not required to run the live demonstration.
+The trained checkpoints for all three architectures are stored under `ml/models/`. Raw datasets are not required to run the live demonstration.
 
 ## Running the Live Demonstration
 
@@ -218,7 +219,7 @@ source .venv/bin/activate
 python backend/app.py
 ```
 
-The backend starts at `http://127.0.0.1:5000` and loads the eye and mouth MobileNetV3-Small checkpoints once.
+The backend starts at `http://127.0.0.1:5000` and loads the selected architecture’s eye and mouth checkpoints on first use. Subsequent frames reuse the loaded models.
 
 ### Terminal 2 — start the frontend
 
@@ -307,14 +308,14 @@ The backend suite currently covers temporal accumulation, sustained-closure esca
 DriveAI/
 ├── backend/
 │   ├── app.py                 # Local HTTP inference service
-│   ├── model_runtime.py       # MobileNet loading and prediction
+│   ├── model_runtime.py       # Three-architecture loading and prediction
 │   ├── vision.py              # Face, eye, and mouth crop extraction
 │   ├── fatigue_engine.py      # Temporal and context-aware decision policy
 │   ├── detect_fatigue.py      # Compatibility facade
 │   └── tests/                 # Backend unit and model-runtime tests
 ├── ml/
 │   ├── notebooks/             # One training/comparison notebook per architecture
-│   ├── models/                # Deployed MobileNet checkpoints and reports
+│   ├── models/                # Trained eye and mouth checkpoints for all architectures
 │   ├── results/               # Compact EfficientNet and ResNet evaluation evidence
 │   ├── scripts/               # Extraction, labeling, splitting, and packaging tools
 │   ├── annotation_app.py      # Local review/annotation server
